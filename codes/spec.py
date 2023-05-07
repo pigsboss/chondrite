@@ -82,7 +82,9 @@ if __name__ == "__main__":
     wrng = np.arange(lambda_0, lambda_1, d_lambda)
     arng = spec_a(wrng) / spec_a(lambda_n)
     brng = spec_b(wrng) / spec_b(lambda_n)
-    print('Corr: {:.6f}'.format((spec_corr(arng, brng))))
+    corr = spec_corr(arng, brng)
+    print('Corr: {:.6f}'.format(corr))
+    print('S.A.: {:.6f} degrees'.format(np.rad2deg(np.arccos(corr))))
     if plotspec:
         plt.close()
         plt.plot(wrng, arng, label=specname_a)
