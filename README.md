@@ -64,3 +64,5 @@ rm -rf brew-install
 ```zsh
 eval "$(/opt/homebrew/bin/brew shellenv)"
 ```
+
+#### 安装哪个版本的 Python?
