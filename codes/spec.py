@@ -48,6 +48,10 @@ def spec_corr(x,y):
 if __name__ == "__main__":
     opts, args = gnu_getopt(sys.argv[1:], 'hf:t:r:n:p:')
     plotspec = False
+    lambda_0 = None
+    lambda_1 = None
+    d_lambda = 0.1
+    lambda_n = None
     for opt, val in opts:
         if opt == '-h':
             print(__doc__)
@@ -69,6 +73,12 @@ if __name__ == "__main__":
     assert path.isfile(csvfile_b), csvfile_b+' does not exist.'
     specname_a, spec_a = load_spec(csvfile_a)
     specname_b, spec_b = load_spec(csvfile_b)
+    if lambda_0 is None:
+        lambda_0 = max(spec_a.x[0], spec_b.x[0])
+    if lambda_1 is None:
+        lambda_1 = min(spec_a.x[-1], spec_b.x[-1])
+    if lambda_n is None:
+        lambda_n = (lambda_0 + lambda_1) / 2.
     wrng = np.arange(lambda_0, lambda_1, d_lambda)
     arng = spec_a(wrng) / spec_a(lambda_n)
     brng = spec_b(wrng) / spec_b(lambda_n)
