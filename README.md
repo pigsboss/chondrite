@@ -101,4 +101,25 @@ python3.12 -m venv python3_12
 
 运行后，可发现终端提示符也发生变化，提示用户当前激活的虚拟环境。
 
-#### 欢迎来到 Pypi
+#### 欢迎来到 PyPi
+Python Package Index, 缩写 PyPi, 可理解为 Python 官方建立的、第三方软件库。
+通过 `pip` 命令（其本身也是 Python 的一个模块，因而也可以通过 `python -m pip` 运行）可管理 Python 的模块。
+安装常用的模块：
+
+```zsh
+pip install numpy scipy matplotlib
+```
+
+*JupyterLab* 是基于网页的、交互式的开发环境，可方便的处理记事本（notebook）、代码与数据，
+提供类似 MATLAB 的功能。
+记事本是交互式的、日志式的，代码块、运算结果、图表等混合排版的文件，
+可方便的转换为文档，文件后缀是 `.ipynb`，可视为 Jupyter 前身 IPython 记事本的升级。
+代码就是普通的 Python 源代码文件，后缀为 `.py`, 因此 JupyterLab 也集成了 Python 代码编辑器功能。
+数据支持 NumPy 的二进制 `.npy` 文件，以及文本格式的 `.csv` 等。
+
+接下来，我们假设开发与测试均基于 JupyterLab 环境。
+运行下列命令安装 JupyterLab:
+
+```zsh
+pip install jupyterlab
+```
