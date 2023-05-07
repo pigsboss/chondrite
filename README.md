@@ -16,9 +16,9 @@
 
 我们可以创建一个跨 Shell 使用的配置文件 `~/.profile` 以便于在包含其他操作系统的局域网内面向跨操作系统的用户提供尽可能一致的环境变量，并在 `~/.zshrc` 加载该文件。
 
-```
-[[ -e ~/.profile ]] && emulate sh -c 'source ~/.profile'
 ```zsh
+[[ -e ~/.profile ]] && emulate sh -c 'source ~/.profile'
+```
 
 #### Homebrew, the missing package manager for macOS
 由于homebrew资源经常难以访问，或即便能够访问，也难以获得令人满意的体验，我们推荐通过镜像访问。
