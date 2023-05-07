@@ -23,4 +23,13 @@
 #### Homebrew, the missing package manager for macOS
 由于homebrew资源经常难以访问，或即便能够访问，也难以获得令人满意的体验，我们推荐通过镜像访问。
 推荐的镜像是清华大学开源软件镜像站。
+在 `~/.profile` 添加并设置以下环境变量，从而使得每次启动会话时，自动配置镜像。
+
+```zsh
+export HOMEBREW_API_DOMAIN="https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles/api"
+export HOMEBREW_BOTTLE_DOMAIN="https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles"
+export HOMEBREW_BREW_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git"
+export HOMEBREW_CORE_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git"
+export HOMEBREW_PIP_INDEX_URL="https://pypi.tuna.tsinghua.edu.cn/simple"
+```
 
