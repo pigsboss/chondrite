@@ -20,7 +20,7 @@ from getopt import gnu_getopt
 from scipy.interpolate import interp1d
 
 plt.rcParams['font.family'] = 'sans-serif'
-plt.rcParams['font.sans-serif'] = ['WenQuanYi Zen Hei']
+plt.rcParams['font.sans-serif'] = ['WenQuanYi Zen Hei', 'Hiragino Sans GB']
 
 def load_spec(csvfile):
     """load spectrum from CSV file.
