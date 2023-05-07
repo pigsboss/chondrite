@@ -66,3 +66,39 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 ```
 
 #### 安装哪个版本的 Python?
+Python 多版本并存已经常态化。
+以2023年5月状态为例，Python3.6 及更早版本已经结束生命周期，
+Python3.7 至 Python3.10 仅支持发布安全补丁，
+Python3.11 仅支持修复错误，
+Python3.12 是主流版本，支持新增特性。
+
+由于 Python 与操作系统耦合，用户自行变更 Python 的版本或设置可能引发操作系统故障，
+因此强烈建议用户仅通过 Homebrew 包管理器在用户层面（而非系统层面）安装并管理不同版本的 Python.
+
+例如，用户可以同时安装不同版本的 Python:
+
+```zsh
+brew install python@3.11
+brew install python@3.12
+```
+
+还可以针对不同版本的 Python 分别建立运行开发环境：
+
+```zsh
+python3.11 -m venv python3_11
+python3.12 -m venv python3_12
+```
+
+通过运行上述命令，将在用户主目录创建两个路径 `~/python3_11` 和 `~/python3_12` 分别作为两个不同版本 Python 的虚拟环境。
+在虚拟环境内运行 Python 及相关程序，将有利于避免对虚拟环境之外或其他虚拟环境的 Python 造成影响。
+
+例如，通过下面的命令，在当前的会话加载相应的环境变量，
+并进入指定的虚拟环境（其中，符号`.`表示在 Shell 中运行之后的脚本，对 bash 或 zsh 均有效）：
+
+```zsh
+. ~/python3_11/bin/activate
+```
+
+运行后，可发现终端提示符也发生变化，提示用户当前激活的虚拟环境。
+
+#### 欢迎来到 Pypi
