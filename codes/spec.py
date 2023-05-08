@@ -8,6 +8,7 @@ a.csv and b.csv are the two spectra CSV files.
 -r  D_LAMBDA is wavelength sampling resolution.
 -n  LAMBDA_n is wavelength where two spectra are normalized.
 -p  plot spectra and save as graphic file or show in GUI.
+-s  SCALE
 -h  print this message.
 """
 
@@ -18,9 +19,9 @@ import matplotlib.pyplot as plt
 from os import path
 from getopt import gnu_getopt
 from scipy.interpolate import interp1d
+from scipy.optimize import curve_fit
 
-plt.rcParams['font.family'] = 'sans-serif'
-plt.rcParams['font.sans-serif'] = ['WenQuanYi Zen Hei', 'Hiragino Sans GB']
+font = {'family': ['Hiragino Sans GB']}
 
 def load_spec(csvfile):
     """load spectrum from CSV file.
@@ -42,16 +43,40 @@ def load_spec(csvfile):
     spec = interp1d(wdat, sdat, 'linear')
     return specname, spec
 
-def spec_corr(x,y):
-    return (np.sum(x*y) / np.sqrt(np.sum(x**2.)*np.sum(y**2.)))
+def spec_corr(w, x, y, scale=0):
+    func1 = lambda u,a,b: a*u+b
+    func2 = lambda u,a,b,c: a*u**2.+b*u+c
+    func3 = lambda u,a,b,c,d: a*u**3.+b*u**2.+c*u+d
+    if scale==0:
+        sx = np.mean(x)*np.ones_like(x)
+        sy = np.mean(y)*np.ones_like(y)
+    elif scale==1:
+        popt,pcov = curve_fit(func1, w, x)
+        sx = func1(w, *popt)
+        popt,pcov = curve_fit(func1, w, y)
+        sy = func1(w, *popt)
+    elif scale==2:
+        popt,pcov = curve_fit(func2, w, x)
+        sx = func2(w, *popt)
+        popt,pcov = curve_fit(func2, w, y)
+        sy = func2(w, *popt)
+    elif scale==3:
+        popt,pcov = curve_fit(func3, w, x)
+        sx = func3(w, *popt)
+        popt,pcov = curve_fit(func3, w, y)
+        sy = func3(w, *popt)
+    vx = x - sx
+    vy = y - sy
+    return (np.sum(vx*vy) / np.sqrt(np.sum(vx**2.)*np.sum(vy**2.))), vx, vy, sx, sy
 
 if __name__ == "__main__":
-    opts, args = gnu_getopt(sys.argv[1:], 'hf:t:r:n:p:')
+    opts, args = gnu_getopt(sys.argv[1:], 'hf:t:r:n:p:s:')
     plotspec = False
     lambda_0 = None
     lambda_1 = None
     d_lambda = 0.1
     lambda_n = None
+    scale = 0
     for opt, val in opts:
         if opt == '-h':
             print(__doc__)
@@ -67,6 +92,8 @@ if __name__ == "__main__":
         elif opt == '-p':
             plotspec = True
             plotname = val
+        elif opt == '-s':
+            scale = int(val)
     csvfile_a = path.normpath(path.abspath(path.realpath(args[0])))
     csvfile_b = path.normpath(path.abspath(path.realpath(args[1])))
     assert path.isfile(csvfile_a), csvfile_a+' does not exist.'
@@ -82,16 +109,21 @@ if __name__ == "__main__":
     wrng = np.arange(lambda_0, lambda_1, d_lambda)
     arng = spec_a(wrng) / spec_a(lambda_n)
     brng = spec_b(wrng) / spec_b(lambda_n)
-    corr = spec_corr(arng, brng)
+    corr,va,vb,sa,sb = spec_corr(wrng, arng, brng, scale=scale)
     print('Corr: {:.6f}'.format(corr))
     print('S.A.: {:.6f} degrees'.format(np.rad2deg(np.arccos(corr))))
     if plotspec:
         plt.close()
         plt.plot(wrng, arng, label=specname_a)
         plt.plot(wrng, brng, label=specname_b)
+        if scale>0:
+            plt.plot(wrng, va, label=specname_a+' 变化值')
+            plt.plot(wrng, vb, label=specname_b+' 变化值')
+            plt.plot(wrng, sa, '-.', label=specname_a+' 平均值')
+            plt.plot(wrng, sb, '-.', label=specname_b+' 平均值')
         plt.xlabel('wavelength, in nm')
         plt.ylabel('reflectance, normalized')
-        plt.legend()
+        plt.legend(prop=font)
         if len(plotname) > 0:
             plt.savefig(plotname,dpi=800)
             plt.close()
