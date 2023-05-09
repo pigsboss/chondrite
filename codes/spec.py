@@ -28,7 +28,7 @@ from getopt import gnu_getopt
 from scipy.interpolate import interp1d
 from scipy.optimize import curve_fit
 
-font = {'family': ['Hiragino Sans GB']}
+fontprop = {'family': 'FangSong'}
 
 def load_spec(csvfile):
     """load spectrum from CSV file.
@@ -55,9 +55,14 @@ def load_excel(excelfile):
 """
     df = pd.read_excel(excelfile, usecols=[0,1])
     specname_a = df.columns[1]
-    valid_rows = np.logical_not(np.isnan(np.double(df[specname_a])))
-    wdat,sdat = np.double(df)[valid_rows,:].transpose()
-    spec = interp1d(wdat, sdat, 'linear')
+    nan_rows  = np.isnan(np.double(df[specname_a]))
+    wdat,sdat = np.double(df)[~nan_rows,:].transpose()
+    spec_a = interp1d(wdat, sdat, 'linear')
+    df = pd.read_excel(excelfile, usecols=[2,3])
+    specname_b = df.columns[1]
+    nan_rows  = np.isnan(np.double(df[specname_b]))
+    wdat,sdat = np.double(df)[~nan_rows,:].transpose()
+    spec_b = interp1d(wdat, sdat, 'linear')
     return specname_a, specname_b, spec_a, spec_b
 
 def spec_corr(w, x, y, scale=0):
@@ -139,13 +144,13 @@ if __name__ == "__main__":
         plt.plot(wrng, arng, label=specname_a)
         plt.plot(wrng, brng, label=specname_b)
         if scale>0:
-            plt.plot(wrng, va, label=specname_a+' 变化值')
-            plt.plot(wrng, vb, label=specname_b+' 变化值')
-            plt.plot(wrng, sa, '-.', label=specname_a+' 平均值')
-            plt.plot(wrng, sb, '-.', label=specname_b+' 平均值')
+            plt.plot(wrng, va, label=specname_a+' 特征')
+            plt.plot(wrng, vb, label=specname_b+' 特征')
+            plt.plot(wrng, sa, '-.', label=specname_a+' 均值')
+            plt.plot(wrng, sb, '-.', label=specname_b+' 均值')
         plt.xlabel('wavelength, in nm')
         plt.ylabel('reflectance, normalized')
-        plt.legend(prop=font)
+        plt.legend(prop=fontprop)
         if len(plotname) > 0:
             plt.savefig(plotname,dpi=800)
             plt.close()
