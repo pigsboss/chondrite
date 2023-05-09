@@ -22,13 +22,15 @@ import numpy as np
 import pandas as pd
 import csv
 import sys
+import matplotlib
 import matplotlib.pyplot as plt
+import logging
 from os import path
 from getopt import gnu_getopt
 from scipy.interpolate import interp1d
 from scipy.optimize import curve_fit
 
-fontprop = {'family': 'FangSong'}
+logging.getLogger('matplotlib.font_manager').setLevel(logging.ERROR)
 
 def load_spec(csvfile):
     """load spectrum from CSV file.
@@ -142,17 +144,24 @@ if __name__ == "__main__":
     if plotspec:
         plt.close()
         plt.plot(wrng, arng, label=specname_a)
+        if scale>0:
+            plt.plot(wrng, va, label=specname_a+'，特征')
+            plt.plot(wrng, sa, '-.', label=specname_a+'，均值')
         plt.plot(wrng, brng, label=specname_b)
         if scale>0:
-            plt.plot(wrng, va, label=specname_a+' 特征')
-            plt.plot(wrng, vb, label=specname_b+' 特征')
-            plt.plot(wrng, sa, '-.', label=specname_a+' 均值')
-            plt.plot(wrng, sb, '-.', label=specname_b+' 均值')
+            plt.plot(wrng, vb, label=specname_b+'，特征')
+            plt.plot(wrng, sb, '-.', label=specname_b+'，均值')
         plt.xlabel('wavelength, in nm')
         plt.ylabel('reflectance, normalized')
-        plt.legend(prop=fontprop)
         if len(plotname) > 0:
-            plt.savefig(plotname,dpi=800)
+            plt.rcParams.update({
+                "pgf.preamble": "\n".join([
+                    r"\usepackage{ctex}"
+                ])
+            })
+            plt.legend()
+            plt.savefig(plotname, dpi=800, backend='pgf')
             plt.close()
         else:
+            plt.legend(prop={'family': ['SimHei', 'Hiragino Sans GB']})
             plt.show()
