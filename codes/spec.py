@@ -1,18 +1,25 @@
 #!/usr/bin/env python
 """Measure similarity of two spectra.
 Syntax:
-spec.py a.csv b.csv -f LAMBDA_0 -t LAMBDA_1 -r D_LAMBDA -n LAMBDA_n -p figure_name
-a.csv and b.csv are the two spectra CSV files.
+spec.py a.csv b.csv
+where a.csv and b.csv are the two spectra CSV files.
+
+spec.py ab.xlsx
+where ab.xlsx is the four-column Excel file that contains both spectra. 
+
+Options:
 -f  LAMBDA_0 is minimum wavelength of spectral band.
 -t  LAMBDA_1 is maximum wavelength of spectral band.
 -r  D_LAMBDA is wavelength sampling resolution.
 -n  LAMBDA_n is wavelength where two spectra are normalized.
--p  plot spectra and save as graphic file or show in GUI.
--s  SCALE
+-p  PLOTNAME plot spectra and save as graphic file or show in GUI.
+-s  SCALE (0, 1, 2, or 3) is the order of polynomial slope to be truncated
+    before cross-correlating.
 -h  print this message.
 """
 
 import numpy as np
+import pandas as pd
 import csv
 import sys
 import matplotlib.pyplot as plt
@@ -42,6 +49,16 @@ def load_spec(csvfile):
     sdat = np.double(slst)
     spec = interp1d(wdat, sdat, 'linear')
     return specname, spec
+
+def load_excel(excelfile):
+    """Load spectra from Excel file.
+"""
+    df = pd.read_excel(excelfile, usecols=[0,1])
+    specname_a = df.columns[1]
+    valid_rows = np.logical_not(np.isnan(np.double(df[specname_a])))
+    wdat,sdat = np.double(df)[valid_rows,:].transpose()
+    spec = interp1d(wdat, sdat, 'linear')
+    return specname_a, specname_b, spec_a, spec_b
 
 def spec_corr(w, x, y, scale=0):
     func1 = lambda u,a,b: a*u+b
@@ -94,12 +111,17 @@ if __name__ == "__main__":
             plotname = val
         elif opt == '-s':
             scale = int(val)
-    csvfile_a = path.normpath(path.abspath(path.realpath(args[0])))
-    csvfile_b = path.normpath(path.abspath(path.realpath(args[1])))
-    assert path.isfile(csvfile_a), csvfile_a+' does not exist.'
-    assert path.isfile(csvfile_b), csvfile_b+' does not exist.'
-    specname_a, spec_a = load_spec(csvfile_a)
-    specname_b, spec_b = load_spec(csvfile_b)
+    if len(args)==2:
+        csvfile_a = path.normpath(path.abspath(path.realpath(args[0])))
+        csvfile_b = path.normpath(path.abspath(path.realpath(args[1])))
+        assert path.isfile(csvfile_a), csvfile_a+' does not exist.'
+        assert path.isfile(csvfile_b), csvfile_b+' does not exist.'
+        specname_a, spec_a = load_csv(csvfile_a)
+        specname_b, spec_b = load_csv(csvfile_b)
+    else:
+        excelfile = path.normpath(path.abspath(path.realpath(args[0])))
+        assert path.isfile(excelfile), excelfile+' does not exist.'
+        specname_a, specname_b, spec_a, spec_b = load_excel(excelfile)
     if lambda_0 is None:
         lambda_0 = max(spec_a.x[0], spec_b.x[0])
     if lambda_1 is None:
